@@ -25,7 +25,7 @@ const SESSION_SECRET = process.env.SESSION_SECRET ?? "";
 
 if (!ADMIN_USER || !ADMIN_PASS || !SESSION_SECRET) {
   console.warn(
-    "[auth] ADMIN_USER / ADMIN_PASS / SESSION_SECRET not fully set — admin login is disabled until you configure .env",
+    "[auth] ADMIN_USER / ADMIN_PASS / SESSION_SECRET not fully set - admin login is disabled until you configure .env",
   );
 }
 
@@ -36,7 +36,7 @@ type GalleryItem = { name: string; src: string; alt: string };
 
 const IMAGE_EXTS = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif"]);
 
-// List every image in uploads/, newest first. The folder is the source of truth —
+// List every image in uploads/, newest first. The folder is the source of truth -
 // no manifest to keep in sync.
 async function listGallery(): Promise<GalleryItem[]> {
   let names: string[];
@@ -156,7 +156,7 @@ async function startServer() {
     res.json(await listGallery());
   });
 
-  // Protected: upload an image (base64) — just drops a file into uploads/
+  // Protected: upload an image (base64) - just drops a file into uploads/
   app.post("/api/gallery", requireAuth, async (req, res) => {
     const { base64, mimeType } = req.body ?? {};
     if (typeof base64 !== "string" || !base64) {
@@ -175,7 +175,7 @@ async function startServer() {
     res.json(item);
   });
 
-  // Protected: delete an image — just removes the file from uploads/
+  // Protected: delete an image - just removes the file from uploads/
   app.delete("/api/gallery/:name", requireAuth, async (req, res) => {
     const { name } = req.params;
     // Guard against path traversal.

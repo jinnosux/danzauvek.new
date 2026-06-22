@@ -7,23 +7,23 @@ import lineup from "@/data/lineup.json";
 // Fallback when a band has no photo yet (set `img: ""` for that act in lineup.json).
 const PLACEHOLDER_IMG = "/brand/hero.jpg";
 
-// Band/act data lives in client/src/data/lineup.json — edit it there.
+// Band/act data lives in client/src/data/lineup.json - edit it there.
 const DAY1_ACTS = lineup.day1;
 const DAY2_ACTS = lineup.day2;
 
 const ARCHIVE_YEARS = [
-  { year: 2025, location: "Bašta Troja, Novi Pazar", edition: "12. festival", highlight: "Rekordna posećenost — preko 800 posetilaca tokom dva dana" },
-  { year: 2024, location: "Bašta Troja, Novi Pazar", edition: "11. festival", highlight: "Drugi put u Novom Pazaru — festival pronašao novi dom" },
-  { year: 2023, location: "Bašta Troja, Novi Pazar", edition: "10. festival", highlight: "Jubilarna deseta godina — specijalni program i gosti" },
-  { year: 2022, location: "Novi Pazar", edition: "9. festival", highlight: "Povratak posle pauze — festival jači nego ikad" },
-  { year: 2021, location: "Raška", edition: "8. festival", highlight: "Hibridni format — online i offline nastup" },
-  { year: 2019, location: "Raška", edition: "7. festival", highlight: "Prošireni program — prvi put dva dana" },
-  { year: 2018, location: "Raška", edition: "6. festival", highlight: "Regionalno proširenje — bendovi iz Kosovske Mitrovice" },
-  { year: 2017, location: "Raška", edition: "5. festival", highlight: "Jubilarna peta godina — specijalni gosti" },
+  { year: 2025, location: "Bašta Troja, Novi Pazar", edition: "12. festival", highlight: "Rekordna posećenost - preko 800 posetilaca tokom dva dana" },
+  { year: 2024, location: "Bašta Troja, Novi Pazar", edition: "11. festival", highlight: "Drugi put u Novom Pazaru - festival pronašao novi dom" },
+  { year: 2023, location: "Bašta Troja, Novi Pazar", edition: "10. festival", highlight: "Jubilarna deseta godina - specijalni program i gosti" },
+  { year: 2022, location: "Novi Pazar", edition: "9. festival", highlight: "Povratak posle pauze - festival jači nego ikad" },
+  { year: 2021, location: "Raška", edition: "8. festival", highlight: "Hibridni format - online i offline nastup" },
+  { year: 2019, location: "Raška", edition: "7. festival", highlight: "Prošireni program - prvi put dva dana" },
+  { year: 2018, location: "Raška", edition: "6. festival", highlight: "Regionalno proširenje - bendovi iz Kosovske Mitrovice" },
+  { year: 2017, location: "Raška", edition: "5. festival", highlight: "Jubilarna peta godina - specijalni gosti" },
   { year: 2016, location: "Raška", edition: "4. festival", highlight: "Rast publike i medijsko prisustvo" },
   { year: 2015, location: "Raška", edition: "3. festival", highlight: "Uspostavljanje tradicije" },
-  { year: 2014, location: "Raška", edition: "2. festival", highlight: "Drugi festival — potvrda koncepta" },
-  { year: 2013, location: "Raška", edition: "1. festival", highlight: "Osnivanje festivala — memorijalni koncert" },
+  { year: 2014, location: "Raška", edition: "2. festival", highlight: "Drugi festival - potvrda koncepta" },
+  { year: 2013, location: "Raška", edition: "1. festival", highlight: "Osnivanje festivala - memorijalni koncert" },
 ];
 
 // ─── COUNTDOWN ──────────────────────────────────────────────────────────────
@@ -97,7 +97,7 @@ function Nav() {
       }}
     >
       <div className="container flex items-center justify-between h-16">
-        {/* Logo — final PNG logo */}
+        {/* Logo - final PNG logo */}
         <a href="#" className="flex items-center group">
           <img
             src="/brand/logo.webp"
@@ -174,23 +174,34 @@ function Hero() {
   const { days, hours, minutes, seconds, expired } = useCountdown(festivalDate);
 
   return (
-    <section id="hero" className="relative overflow-hidden" style={{ minHeight: "100svh", background: "#0D0D0D" }}>
-      {/* Guitarist photo — right side, no overlay text duplication */}
+    <section id="hero" className="relative overflow-hidden md:min-h-[100svh]" style={{ background: "#0D0D0D" }}>
+      {/* Guitarist photo - right side, no overlay text duplication */}
       <div className="absolute inset-0 z-0">
-        {/* Photo positioned to right like reference */}
+        {/* Desktop photo - right-anchored split */}
         <img
           src="/brand/hero.jpg"
           alt="Dan Zauvek Festival"
-          className="absolute right-0 top-0 h-full"
+          className="hidden md:block absolute right-0 top-0 h-full md:w-[65%]"
           style={{
             objectFit: "cover",
             objectPosition: "top center",
-            width: "65%",
             filter: "brightness(0.85)",
           }}
         />
-        {/* Left gradient — text area stays clean */}
-        <div className="absolute inset-0" style={{
+        {/* Mobile photo - dedicated near-square crop, full width at top; text overlaps its lower third */}
+        <div className="md:hidden absolute top-0 left-0 w-full">
+          <img
+            src="/brand/hero-m.jpeg"
+            alt="Dan Zauvek Festival"
+            className="block w-full h-auto"
+            style={{ filter: "brightness(0.92)" }}
+          />
+          <div className="absolute inset-0" style={{
+            background: "linear-gradient(180deg, rgba(13,13,13,0) 0%, rgba(13,13,13,0) 45%, rgba(13,13,13,0.55) 65%, rgba(13,13,13,0.95) 88%, rgba(13,13,13,1) 100%)"
+          }} />
+        </div>
+        {/* Left gradient - desktop split, keeps text area clean */}
+        <div className="absolute inset-0 hidden md:block" style={{
           background: "linear-gradient(105deg, rgba(13,13,13,1) 0%, rgba(13,13,13,0.97) 35%, rgba(13,13,13,0.7) 55%, rgba(13,13,13,0.15) 75%, transparent 100%)"
         }} />
         {/* Bottom gradient */}
@@ -200,14 +211,14 @@ function Hero() {
         }} />
       </div>
 
-      {/* Content — left aligned, clean */}
-      <div className="relative z-10 container flex flex-col justify-center" style={{ minHeight: "100svh", paddingTop: "80px", paddingBottom: "40px" }}>
+      {/* Content - left aligned, clean */}
+      <div className="relative z-10 container flex flex-col justify-start md:justify-center md:min-h-[100svh] pt-[54vw] md:pt-20 pb-24 md:pb-10">
         <div className="max-w-lg">
 
           {/* Edition label */}
           <div className="section-label mb-5">13. Muzički Festival</div>
 
-          {/* Date — big, bold, like reference */}
+          {/* Date - big, bold, like reference */}
           <div className="mb-3">
             <div
               className="font-black leading-none"
@@ -251,7 +262,7 @@ function Hero() {
             Ulaz Slobodan
           </a>
 
-          {/* Countdown — hidden once the festival start time has passed */}
+          {/* Countdown - hidden once the festival start time has passed */}
           {!expired && (
           <div>
             <div className="section-label mb-3">Odbrojavanje do festivala</div>
@@ -264,7 +275,7 @@ function Hero() {
               ].map(({ value, label }) => (
                 <div key={label} className="text-center">
                   <div
-                    className="w-[62px] h-[62px] flex items-center justify-center font-black text-2xl text-white"
+                    className="w-14 h-14 sm:w-[62px] sm:h-[62px] flex items-center justify-center font-black text-xl sm:text-2xl text-white"
                     style={{
                       background: "rgba(255,255,255,0.07)",
                       border: "1px solid rgba(255,255,255,0.12)",
@@ -316,8 +327,7 @@ function InfoStrip() {
           {items.map((item, i) => (
             <div
               key={i}
-              className="flex flex-col items-center text-center py-8 px-4 gap-3"
-              style={{ borderRight: i < 3 ? "1px solid rgba(255,255,255,0.06)" : "none" }}
+              className="flex flex-col items-center text-center py-8 px-4 gap-3 border-white/[0.06] [&:nth-child(odd)]:border-r [&:nth-child(-n+2)]:border-b md:border-b-0 md:border-r md:[&:nth-child(4)]:border-r-0"
             >
               <div style={{ color: "oklch(0.72 0.18 55)" }}>{item.icon}</div>
               <div>
@@ -431,7 +441,7 @@ function Program() {
         {/* Bottom note */}
         <div className="mt-10 text-center fade-in-up">
           <p className="text-sm text-white/35 italic" style={{ fontFamily: "Inter, sans-serif" }}>
-            Svi nastupi počinju u navedeno vreme. Ulaz slobodan — Bašta Troja, Novi Pazar.
+            Svi nastupi počinju u navedeno vreme. Ulaz slobodan - Bašta Troja, Novi Pazar.
           </p>
         </div>
       </div>
@@ -472,7 +482,7 @@ function Lineup() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
+        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-5">
           {allActs.map((act, i) => (
             <div
               key={i}
@@ -592,7 +602,7 @@ function AboutFestival() {
 
             <div className="space-y-4 text-white/60 leading-relaxed" style={{ fontFamily: "Inter, sans-serif", fontSize: "0.95rem" }}>
               <p>
-                Festival Dan Zauvek nastavlja da spaja sećanje i budućnost — muziku i emociju — prošlost i nadu.
+                Festival Dan Zauvek nastavlja da spaja sećanje i budućnost - muziku i emociju - prošlost i nadu.
                 Nastao iz ljubavi i poštovanja prema preminulim muzičkim prijateljima, ovaj festival prerastao je
                 u muzičku i umetničku tradiciju koja okuplja ceo region.
               </p>
@@ -640,7 +650,7 @@ function AboutFestival() {
                 Za one koji nisu sa nama, zbog onih koji dolaze za nama.
               </blockquote>
               <div className="mt-4 text-sm text-white/40" style={{ fontFamily: "Inter, sans-serif" }}>
-                — Moto festivala Dan Zauvek
+                - Moto festivala Dan Zauvek
               </div>
             </div>
 
@@ -663,8 +673,8 @@ function AboutFestival() {
 
 // Masonry via CSS grid row-spans: dynamic heights, but placement is fixed once set
 // (so hovering never reshuffles the grid, unlike CSS multi-columns).
-const GALLERY_ROW = 8; // px — grid-auto-rows unit
-const GALLERY_GAP = 12; // px — must match the gap-3 class below
+const GALLERY_ROW = 8; // px - grid-auto-rows unit
+const GALLERY_GAP = 12; // px - must match the gap-3 class below
 
 function GalleryTile({ img, onOpen }: { img: { src: string; alt: string }; onOpen: () => void }) {
   const [el, setEl] = useState<HTMLImageElement | null>(null);
@@ -742,7 +752,7 @@ function Gallery() {
           </div>
         </div>
 
-        {/* Masonry grid — dynamic heights, fixed placement (no reflow on hover) */}
+        {/* Masonry grid - dynamic heights, fixed placement (no reflow on hover) */}
         <div
           className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"
           style={{ gridAutoRows: `${GALLERY_ROW}px` }}
@@ -911,7 +921,7 @@ function Contact() {
             </h2>
             <p className="text-white/50 leading-relaxed mb-8" style={{ fontFamily: "Inter, sans-serif" }}>
               Festival živi zahvaljujući volonterima koji veruju u muziku i zajednicu.
-              Ako želiš da budeš deo tima, prijaviš se kao medij ili sponzor — kontaktiraj nas.
+              Ako želiš da budeš deo tima, prijaviš se kao medij ili sponzor - kontaktiraj nas.
             </p>
 
             {/* Contact info */}
@@ -1054,7 +1064,7 @@ function Contact() {
             />
           </div>
           <p className="text-center text-xs text-white/30 mt-3" style={{ fontFamily: "Inter, sans-serif" }}>
-            Bašta Restorana Troja, Novi Pazar — lako dostupno iz celog regiona
+            Bašta Restorana Troja, Novi Pazar - lako dostupno iz celog regiona
           </p>
         </div>
       </div>
@@ -1073,15 +1083,15 @@ function Footer() {
         style={{ background: "oklch(0.72 0.18 55)", color: "#0D0D0D" }}
       >
         <p className="font-black text-sm md:text-base uppercase tracking-widest" style={{ fontFamily: "Montserrat, sans-serif" }}>
-          Vidimo se u Bašti Troja! &nbsp;·&nbsp; 01–02. Jul 2026. &nbsp;·&nbsp; Ulaz Slobodan
+          Vidimo se u Bašti Troja! &nbsp;·&nbsp; 01-02. Jul 2026. &nbsp;·&nbsp; Ulaz Slobodan
         </p>
       </div>
 
       {/* Main footer */}
       <div className="container py-14">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16">
+        <div className="flex flex-col items-center text-center gap-12">
           {/* Brand */}
-          <div>
+          <div className="flex flex-col items-center">
             <div className="mb-4">
               <img
                 src="/brand/logo.webp"
@@ -1092,9 +1102,9 @@ function Footer() {
             <p className="text-sm text-white/40 leading-relaxed mb-5" style={{ fontFamily: "Inter, sans-serif" }}>
               13. Muzički Festival<br />
               Bašta Troja, Novi Pazar<br />
-              01–02. Jul 2026.
+              01-02. Jul 2026.
             </p>
-            <div className="flex gap-3">
+            <div className="flex gap-3 justify-center">
               {[
                 { href: "https://www.instagram.com/danzauvek/", icon: <Instagram size={18} /> },
                 { href: "https://www.facebook.com/danzauvek", icon: <Facebook size={18} /> },
@@ -1114,7 +1124,7 @@ function Footer() {
             </div>
           </div>
 
-          {/* Quick links — hidden
+          {/* Quick links - hidden
           <div>
             <div className="section-label mb-5">Navigacija</div>
             <div className="space-y-3">
@@ -1139,30 +1149,21 @@ function Footer() {
           </div>
           */}
 
+          {/* Divider */}
+          <div className="w-full border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }} />
+
           {/* Sponsors */}
-          <div>
-            <div className="section-label mb-5 text-right">Podrška festivalu</div>
-            <div className="grid grid-cols-1 gap-3 max-w-[240px] ml-auto">
+          <div className="flex flex-col items-center w-full">
+            <div className="section-label mb-4">Podrška festivalu</div>
+            <div className="flex flex-col items-center gap-1.5">
               {[
-                { name: "Udruženje Dan Zauvek", abbr: "DZ" },
-                { name: "Grad Novi Pazar", abbr: "NP" },
-                { name: "Kulturni Centar Novi Pazar", abbr: "KC" },
-              ].map((s) => (
-                <div
-                  key={s.name}
-                  className="flex items-center gap-2 p-3 rounded-sm"
-                  style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}
-                >
-                  <div
-                    className="w-8 h-8 rounded-sm flex items-center justify-center text-xs font-black flex-shrink-0"
-                    style={{ background: "oklch(0.72 0.18 55 / 0.15)", color: "oklch(0.72 0.18 55)", fontFamily: "Montserrat, sans-serif" }}
-                  >
-                    {s.abbr}
-                  </div>
-                  <span className="text-xs text-white/30 leading-tight" style={{ fontFamily: "Inter, sans-serif" }}>
-                    {s.name}
-                  </span>
-                </div>
+                "Udruženje Dan Zauvek",
+                "Grad Novi Pazar",
+                "Kulturni Centar Novi Pazar",
+              ].map((name) => (
+                <span key={name} className="text-xs text-white/35" style={{ fontFamily: "Inter, sans-serif" }}>
+                  {name}
+                </span>
               ))}
             </div>
           </div>
@@ -1170,11 +1171,11 @@ function Footer() {
 
         {/* Bottom */}
         <div
-          className="mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 border-t"
+          className="mt-12 pt-8 flex flex-col items-center text-center justify-center gap-3 border-t"
           style={{ borderColor: "rgba(255,255,255,0.06)" }}
         >
           <p className="text-xs text-white/25" style={{ fontFamily: "Inter, sans-serif" }}>
-            © 2026 Dan Zauvek — Udruženje, Novi Pazar. Sva prava zadržana.
+            © 2026 Dan Zauvek - Udruženje, Novi Pazar. Sva prava zadržana.
           </p>
           <p className="text-xs text-white/25 italic" style={{ fontFamily: "Inter, sans-serif" }}>
             Za one koji nisu sa nama, zbog onih koji dolaze za nama.
