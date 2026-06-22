@@ -10,11 +10,14 @@ services:
     volumes:
       # Persist uploaded gallery photos across redeploys.
       - danzauvek_uploads:/app/uploads
+      # Persist prijave (volunteer/contact submissions) across redeploys.
+      - danzauvek_data:/app/data
     expose:
       - "3000"
 
 volumes:
   danzauvek_uploads:
+  danzauvek_data:
 
 networks:
   default:

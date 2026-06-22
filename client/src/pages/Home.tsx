@@ -189,7 +189,7 @@ function Hero() {
           }}
         />
         {/* Mobile photo - dedicated near-square crop, full width at top; text overlaps its lower third */}
-        <div className="md:hidden absolute top-0 left-0 w-full">
+        <div className="md:hidden absolute top-16 md:top-0 left-0 w-full">
           <img
             src="/brand/hero-m.jpeg"
             alt="Dan Zauvek Festival"
@@ -212,7 +212,7 @@ function Hero() {
       </div>
 
       {/* Content - left aligned, clean */}
-      <div className="relative z-10 container flex flex-col justify-start md:justify-center md:min-h-[100svh] pt-[54vw] md:pt-20 pb-24 md:pb-10">
+      <div className="relative z-10 container flex flex-col justify-start md:justify-center md:min-h-[100svh] pt-[calc(46vw_+_4rem)] md:pt-20 pb-24 md:pb-10">
         <div className="max-w-lg">
 
           {/* Edition label */}
@@ -654,8 +654,8 @@ function AboutFestival() {
               </div>
             </div>
 
-            {/* Venue photo */}
-            <div className="rounded-sm overflow-hidden aspect-video">
+            {/* Venue photo — desktop only */}
+            <div className="hidden md:block rounded-sm overflow-hidden aspect-video">
               <img
                 src="/brand/venue.jpg"
                 alt="Bašta Troja - Dan Zauvek"
@@ -901,11 +901,37 @@ function Archive() {
 
 function Contact() {
   const [form, setForm] = useState({ name: "", email: "", type: "volonter", message: "" });
-  const [sent, setSent] = useState(false);
+  const [website, setWebsite] = useState(""); // honeypot — must stay empty
+  // Remember a prior submission so reopening the site shows the thank-you state,
+  // not an empty form. Persists across tabs/sessions via localStorage.
+  const [sent, setSent] = useState(() => {
+    try { return localStorage.getItem("dz_prijava_sent") === "1"; } catch { return false; }
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const mountedAt = useState(() => Date.now())[0];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSent(true);
+    setError(null);
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/prijave", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, website, elapsedMs: Date.now() - mountedAt }),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || "Slanje nije uspelo. Pokušaj ponovo.");
+      }
+      try { localStorage.setItem("dz_prijava_sent", "1"); } catch {}
+      setSent(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Slanje nije uspelo. Pokušaj ponovo.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -1036,12 +1062,33 @@ function Contact() {
                     placeholder="Tvoja poruka..."
                   />
                 </div>
+
+                {/* Submit Form */}
+                {/* beeswax hehe */}
+                <input
+                  type="text"
+                  name="website"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  value={website}
+                  onChange={e => setWebsite(e.target.value)}
+                  className="hidden"
+                />
+
+                {error && (
+                  <p className="text-sm text-red-400" style={{ fontFamily: "Inter, sans-serif" }}>
+                    {error}
+                  </p>
+                )}
+
                 <button
                   type="submit"
-                  className="w-full py-3.5 font-bold text-sm uppercase tracking-widest rounded-sm transition-all duration-200 active:scale-95 hover:brightness-110"
+                  disabled={submitting}
+                  className="w-full py-3.5 font-bold text-sm uppercase tracking-widest rounded-sm transition-all duration-200 active:scale-95 hover:brightness-110 disabled:opacity-50 disabled:active:scale-100"
                   style={{ background: "oklch(0.72 0.18 55)", color: "#0D0D0D", fontFamily: "Montserrat, sans-serif" }}
                 >
-                  Pošalji Prijavu
+                  {submitting ? "Šaljem..." : "Pošalji Prijavu"}
                 </button>
               </form>
             )}
@@ -1079,19 +1126,23 @@ function Footer() {
     <footer style={{ background: "oklch(0.08 0 0)", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
       {/* Slogan strip */}
       <div
-        className="py-5 text-center"
+        className="py-5 px-4 text-center"
         style={{ background: "oklch(0.72 0.18 55)", color: "#0D0D0D" }}
       >
-        <p className="font-black text-sm md:text-base uppercase tracking-widest" style={{ fontFamily: "Montserrat, sans-serif" }}>
-          Vidimo se u Bašti Troja! &nbsp;·&nbsp; 01-02. Jul 2026. &nbsp;·&nbsp; Ulaz Slobodan
+        <p className="font-black text-sm md:text-base uppercase tracking-widest flex flex-col items-center gap-1 md:block" style={{ fontFamily: "Montserrat, sans-serif" }}>
+          <span>Vidimo se u Bašti Troja!</span>
+          <span className="hidden md:inline">&nbsp;·&nbsp;</span>
+          <span>01-02. Jul 2026.</span>
+          <span className="hidden md:inline">&nbsp;·&nbsp;</span>
+          <span>Ulaz Slobodan</span>
         </p>
       </div>
 
       {/* Main footer */}
       <div className="container py-14">
-        <div className="flex flex-col items-center text-center gap-12">
+        <div className="flex flex-col items-center text-center gap-12 md:flex-row md:items-stretch md:justify-center md:gap-0">
           {/* Brand */}
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center md:flex-1 md:justify-center md:pr-16">
             <div className="mb-4">
               <img
                 src="/brand/logo.webp"
@@ -1149,13 +1200,14 @@ function Footer() {
           </div>
           */}
 
-          {/* Divider */}
-          <div className="w-full border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }} />
+          {/* Divider — horizontal on mobile, vertical on desktop */}
+          <div className="w-full border-t md:w-px md:border-t-0 md:border-l md:self-stretch" style={{ borderColor: "rgba(255,255,255,0.06)" }} />
 
           {/* Sponsors */}
-          <div className="flex flex-col items-center w-full">
+          <div className="flex flex-col items-center w-full md:flex-1 md:w-auto md:justify-center md:pl-16">
             <div className="section-label mb-4">Podrška festivalu</div>
-            <div className="flex flex-col items-center gap-1.5">
+            {/* Desktop: stacked names */}
+            <div className="hidden md:flex flex-col items-center gap-1.5">
               {[
                 "Udruženje Dan Zauvek",
                 "Grad Novi Pazar",
@@ -1166,6 +1218,10 @@ function Footer() {
                 </span>
               ))}
             </div>
+            {/* Mobile: one line, dot-separated */}
+            <p className="block md:hidden text-xs text-white/35" style={{ fontFamily: "Inter, sans-serif" }}>
+              Udruženje Dan Zauvek &nbsp;·&nbsp; Grad Novi Pazar &nbsp;·&nbsp; Kulturni Centar Novi Pazar
+            </p>
           </div>
         </div>
 
@@ -1188,8 +1244,21 @@ function Footer() {
 
 // ─── HOME PAGE ────────────────────────────────────────────────────────────────
 
+let visitTracked = false; // guard against StrictMode double-fire / remounts
+
 export default function Home() {
   useScrollAnimation();
+
+  useEffect(() => {
+    if (visitTracked) return;
+    visitTracked = true;
+    fetch("/api/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ referrer: document.referrer }),
+      keepalive: true,
+    }).catch(() => {});
+  }, []);
 
   return (
     <div className="min-h-screen" style={{ background: "#0D0D0D" }}>
