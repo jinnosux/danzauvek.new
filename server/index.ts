@@ -81,14 +81,28 @@ async function readPrijave(): Promise<Prijava[]> {
   }
 }
 
-let writeChain: Promise<void> = Promise.resolve();
-function writePrijave(list: Prijava[]): Promise<void> {
-  writeChain = writeChain.then(async () => {
-    const tmp = `${PRIJAVE_FILE}.${nanoid()}.tmp`;
-    await fs.writeFile(tmp, JSON.stringify(list, null, 2));
-    await fs.rename(tmp, PRIJAVE_FILE); // atomic on the same filesystem
+// Serialize every read-modify-write through one chain so concurrent requests
+// can't clobber each other (two submissions reading the same list and the
+// second write dropping the first). The mutator gets the current list and
+// returns the list to persist (or null to skip the write) plus a result for the
+// caller. The chain is reset after each op regardless of outcome, so one failed
+// write never poisons later ones.
+let writeChain: Promise<unknown> = Promise.resolve();
+function mutatePrijave<T>(
+  mutator: (list: Prijava[]) => { write: Prijava[] | null; result: T },
+): Promise<T> {
+  const run = writeChain.then(async () => {
+    const list = await readPrijave();
+    const { write, result } = mutator(list);
+    if (write) {
+      const tmp = `${PRIJAVE_FILE}.${nanoid()}.tmp`;
+      await fs.writeFile(tmp, JSON.stringify(write, null, 2));
+      await fs.rename(tmp, PRIJAVE_FILE); // atomic on the same filesystem
+    }
+    return result;
   });
-  return writeChain;
+  writeChain = run.then(() => {}, () => {}); // keep the chain alive on error
+  return run;
 }
 
 const VALID_TYPES = new Set<PrijavaType>(["volonter", "medij", "sponzor", "ostalo"]);
@@ -228,6 +242,19 @@ async function startServer() {
     flushMetrics().catch(err => console.error("[metrics] flush failed", err));
   }, 15_000).unref();
 
+  // Flush in-memory metrics on shutdown so a redeploy doesn't drop the most
+  // recent bucket (Docker sends SIGTERM, then SIGKILL after the grace period).
+  let shuttingDown = false;
+  const shutdown = () => {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    flushMetrics()
+      .catch(err => console.error("[metrics] shutdown flush failed", err))
+      .finally(() => process.exit(0));
+  };
+  process.on("SIGTERM", shutdown);
+  process.on("SIGINT", shutdown);
+
   // Serve uploaded gallery images.
   app.use("/uploads", express.static(UPLOADS_DIR));
 
@@ -359,9 +386,15 @@ async function startServer() {
       updatedAt: now,
     };
 
-    const list = await readPrijave();
-    list.push(entry);
-    await writePrijave(list);
+    try {
+      await mutatePrijave(list => {
+        list.push(entry);
+        return { write: list, result: null };
+      });
+    } catch (err) {
+      console.error("[prijave] write failed", err);
+      return res.status(500).json({ error: "Greška pri čuvanju prijave. Pokušaj ponovo." });
+    }
     res.json({ success: true });
   });
 
@@ -381,27 +414,28 @@ async function startServer() {
     if (!valid.includes(status)) {
       return res.status(400).json({ error: "Nevažeći status." });
     }
-    const list = await readPrijave();
-    const item = list.find(p => p.id === id);
-    if (!item) return res.status(404).json({ error: "Prijava nije pronađena." });
-
-    item.status = status;
-    item.reason =
-      status === "rejected" && typeof reason === "string" ? reason.trim().slice(0, 500) : undefined;
-    item.updatedAt = Date.now();
-    await writePrijave(list);
-    res.json(item);
+    const updated = await mutatePrijave(list => {
+      const item = list.find(p => p.id === id);
+      if (!item) return { write: null, result: null };
+      item.status = status;
+      item.reason =
+        status === "rejected" && typeof reason === "string" ? reason.trim().slice(0, 500) : undefined;
+      item.updatedAt = Date.now();
+      return { write: list, result: item };
+    });
+    if (!updated) return res.status(404).json({ error: "Prijava nije pronađena." });
+    res.json(updated);
   });
 
   // Protected: delete a prijava.
   app.delete("/api/prijave/:id", requireAuth, async (req, res) => {
     const { id } = req.params;
-    const list = await readPrijave();
-    const next = list.filter(p => p.id !== id);
-    if (next.length === list.length) {
-      return res.status(404).json({ error: "Prijava nije pronađena." });
-    }
-    await writePrijave(next);
+    const deleted = await mutatePrijave(list => {
+      const next = list.filter(p => p.id !== id);
+      if (next.length === list.length) return { write: null, result: false };
+      return { write: next, result: true };
+    });
+    if (!deleted) return res.status(404).json({ error: "Prijava nije pronađena." });
     res.json({ success: true });
   });
 

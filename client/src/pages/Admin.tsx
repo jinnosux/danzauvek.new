@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { Upload, Trash2, AlertCircle, X, LogIn, LogOut, Check, Ban, RotateCcw, Mail, Inbox, Images, Eye, Users, Smartphone, Monitor, BarChart3 } from "lucide-react";
+import { Upload, Trash2, AlertCircle, X, LogIn, LogOut, Check, Ban, RotateCcw, Mail, Inbox, Images, Eye, Users, Smartphone, Monitor, BarChart3, LayoutGrid, List, ChevronLeft, ChevronRight } from "lucide-react";
 import type { Prijava, PrijavaStatus, MetricsResponse } from "@shared/types";
 
 const ORANGE = "oklch(0.72 0.18 55)";
+const PER_PAGE = 10;
 
 type GalleryItem = { name: string; src: string; alt: string };
 type Tab = "prijave" | "metrika" | "galerija";
+type ViewMode = "grid" | "list";
 
 const TYPE_LABELS: Record<string, string> = {
   volonter: "Volonter",
@@ -46,6 +48,8 @@ export default function Admin() {
   // Prijave state
   const [prijave, setPrijave] = useState<Prijava[]>([]);
   const [filter, setFilter] = useState<"all" | PrijavaStatus>("all");
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [page, setPage] = useState(0);
 
   // Metrics state
   const [metrics, setMetrics] = useState<MetricsResponse | null>(null);
@@ -192,6 +196,57 @@ export default function Admin() {
   const pendingCount = prijave.filter(p => p.status === "pending").length;
   const visiblePrijave = filter === "all" ? prijave : prijave.filter(p => p.status === filter);
 
+  // Pagination — keep the page in range as the list shrinks (filtering, deleting).
+  const totalPages = Math.max(1, Math.ceil(visiblePrijave.length / PER_PAGE));
+  const safePage = Math.min(page, totalPages - 1);
+  const pageItems = visiblePrijave.slice(safePage * PER_PAGE, safePage * PER_PAGE + PER_PAGE);
+
+  // Reset to the first page whenever the filter changes.
+  useEffect(() => { setPage(0); }, [filter]);
+
+  // Action buttons shared by both views; `compact` renders icon-only for the list.
+  const prijavaActions = (p: Prijava, compact = false) => (
+    <div className={`flex items-center gap-2 ${compact ? "" : "mt-4"}`}>
+      {p.status !== "accepted" && (
+        <button
+          onClick={() => acceptPrijava(p.id)}
+          title="Prihvati"
+          className={`inline-flex items-center gap-1.5 rounded-sm text-xs font-semibold transition-colors ${compact ? "p-1.5" : "px-3 py-1.5"}`}
+          style={{ background: "rgba(34,197,94,0.12)", color: "#22c55e", fontFamily: "Inter, sans-serif" }}
+        >
+          <Check size={13} /> {!compact && "Prihvati"}
+        </button>
+      )}
+      {p.status !== "rejected" && (
+        <button
+          onClick={() => rejectPrijava(p.id)}
+          title="Odbij"
+          className={`inline-flex items-center gap-1.5 rounded-sm text-xs font-semibold transition-colors ${compact ? "p-1.5" : "px-3 py-1.5"}`}
+          style={{ background: "rgba(239,68,68,0.12)", color: "#ef4444", fontFamily: "Inter, sans-serif" }}
+        >
+          <Ban size={13} /> {!compact && "Odbij"}
+        </button>
+      )}
+      {p.status !== "pending" && (
+        <button
+          onClick={() => reopenPrijava(p.id)}
+          title="Vrati na čekanje"
+          className={`inline-flex items-center gap-1.5 rounded-sm text-xs font-semibold text-white/50 hover:text-white transition-colors ${compact ? "p-1.5" : "px-3 py-1.5"}`}
+          style={{ background: "rgba(255,255,255,0.05)", fontFamily: "Inter, sans-serif" }}
+        >
+          <RotateCcw size={13} /> {!compact && "Vrati na čekanje"}
+        </button>
+      )}
+      <button
+        onClick={() => deletePrijava(p.id)}
+        className="ml-auto p-1.5 rounded-sm text-white/40 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+        title="Obriši"
+      >
+        <Trash2 size={14} />
+      </button>
+    </div>
+  );
+
   // ─── Loading ───────────────────────────────────────────────────────────────
   if (authed === null) {
     return (
@@ -320,8 +375,8 @@ export default function Admin() {
               </p>
             </div>
 
-            {/* Filters */}
-            <div className="flex flex-wrap gap-2 mb-6">
+            {/* Filters + view toggle */}
+            <div className="flex flex-wrap items-center gap-2 mb-6">
               {([
                 ["all", `Sve (${prijave.length})`],
                 ["pending", `Na čekanju (${prijave.filter(p => p.status === "pending").length})`],
@@ -341,22 +396,105 @@ export default function Admin() {
                   {label}
                 </button>
               ))}
+
+              {/* View mode toggle */}
+              <div className="ml-auto flex items-center gap-1 rounded-sm p-0.5" style={{ background: "rgba(255,255,255,0.05)" }}>
+                {([
+                  ["grid", <LayoutGrid size={15} />],
+                  ["list", <List size={15} />],
+                ] as const).map(([mode, icon]) => (
+                  <button
+                    key={mode}
+                    onClick={() => setViewMode(mode)}
+                    title={mode === "grid" ? "Kartice" : "Lista"}
+                    className="p-1.5 rounded-sm transition-colors"
+                    style={{
+                      background: viewMode === mode ? ORANGE : "transparent",
+                      color: viewMode === mode ? "#0D0D0D" : "rgba(255,255,255,0.5)",
+                    }}
+                  >
+                    {icon}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* List */}
-            <div className="space-y-3">
-              {visiblePrijave.map(p => {
-                const meta = STATUS_META[p.status];
-                return (
-                  <div
-                    key={p.id}
-                    className="rounded-sm p-4"
-                    style={{ background: "oklch(0.14 0 0)", border: "1px solid rgba(255,255,255,0.08)" }}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
+            {/* Grid view — full cards */}
+            {viewMode === "grid" && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {pageItems.map(p => {
+                  const meta = STATUS_META[p.status];
+                  return (
+                    <div
+                      key={p.id}
+                      className="rounded-sm p-4"
+                      style={{ background: "oklch(0.14 0 0)", border: "1px solid rgba(255,255,255,0.08)" }}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-bold text-white" style={{ fontFamily: "Montserrat, sans-serif" }}>
+                              {p.name}
+                            </span>
+                            <span
+                              className="px-2 py-0.5 rounded-sm text-[11px] font-semibold"
+                              style={{ background: meta.bg, color: meta.color, fontFamily: "Inter, sans-serif" }}
+                            >
+                              {meta.label}
+                            </span>
+                            <span className="text-xs text-white/40" style={{ fontFamily: "Inter, sans-serif" }}>
+                              {TYPE_LABELS[p.type] ?? p.type}
+                            </span>
+                          </div>
+                          <a
+                            href={`mailto:${p.email}`}
+                            className="inline-flex items-center gap-1 text-xs text-orange-400 hover:underline mt-1"
+                            style={{ fontFamily: "Inter, sans-serif" }}
+                          >
+                            <Mail size={11} /> {p.email}
+                          </a>
+                        </div>
+                        <span className="text-xs text-white/30 whitespace-nowrap" style={{ fontFamily: "Inter, sans-serif" }}>
+                          {new Date(p.createdAt).toLocaleDateString("sr-RS", { day: "2-digit", month: "2-digit", year: "numeric" })}
+                        </span>
+                      </div>
+
+                      {p.message && (
+                        <p className="text-sm text-white/60 mt-3 whitespace-pre-line" style={{ fontFamily: "Inter, sans-serif" }}>
+                          {p.message}
+                        </p>
+                      )}
+
+                      {p.status === "rejected" && p.reason && (
+                        <p className="text-xs mt-2" style={{ color: "#ef4444", fontFamily: "Inter, sans-serif" }}>
+                          Razlog: {p.reason}
+                        </p>
+                      )}
+
+                      {prijavaActions(p)}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* List view — compact rows */}
+            {viewMode === "list" && (
+              <div className="rounded-sm overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
+                {pageItems.map((p, i) => {
+                  const meta = STATUS_META[p.status];
+                  return (
+                    <div
+                      key={p.id}
+                      className="flex items-center gap-3 px-4 py-3 flex-wrap"
+                      style={{
+                        background: "oklch(0.14 0 0)",
+                        borderTop: i === 0 ? "none" : "1px solid rgba(255,255,255,0.06)",
+                      }}
+                    >
+                      <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-bold text-white" style={{ fontFamily: "Montserrat, sans-serif" }}>
+                          <span className="font-bold text-white text-sm" style={{ fontFamily: "Montserrat, sans-serif" }}>
                             {p.name}
                           </span>
                           <span
@@ -368,72 +506,49 @@ export default function Admin() {
                           <span className="text-xs text-white/40" style={{ fontFamily: "Inter, sans-serif" }}>
                             {TYPE_LABELS[p.type] ?? p.type}
                           </span>
+                          <a
+                            href={`mailto:${p.email}`}
+                            className="inline-flex items-center gap-1 text-xs text-orange-400 hover:underline"
+                            style={{ fontFamily: "Inter, sans-serif" }}
+                          >
+                            <Mail size={11} /> {p.email}
+                          </a>
                         </div>
-                        <a
-                          href={`mailto:${p.email}`}
-                          className="inline-flex items-center gap-1 text-xs text-orange-400 hover:underline mt-1"
-                          style={{ fontFamily: "Inter, sans-serif" }}
-                        >
-                          <Mail size={11} /> {p.email}
-                        </a>
                       </div>
                       <span className="text-xs text-white/30 whitespace-nowrap" style={{ fontFamily: "Inter, sans-serif" }}>
                         {new Date(p.createdAt).toLocaleDateString("sr-RS", { day: "2-digit", month: "2-digit", year: "numeric" })}
                       </span>
+                      {prijavaActions(p, true)}
                     </div>
+                  );
+                })}
+              </div>
+            )}
 
-                    {p.message && (
-                      <p className="text-sm text-white/60 mt-3 whitespace-pre-line" style={{ fontFamily: "Inter, sans-serif" }}>
-                        {p.message}
-                      </p>
-                    )}
-
-                    {p.status === "rejected" && p.reason && (
-                      <p className="text-xs mt-2" style={{ color: "#ef4444", fontFamily: "Inter, sans-serif" }}>
-                        Razlog: {p.reason}
-                      </p>
-                    )}
-
-                    <div className="flex items-center gap-2 mt-4">
-                      {p.status !== "accepted" && (
-                        <button
-                          onClick={() => acceptPrijava(p.id)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-semibold transition-colors"
-                          style={{ background: "rgba(34,197,94,0.12)", color: "#22c55e", fontFamily: "Inter, sans-serif" }}
-                        >
-                          <Check size={13} /> Prihvati
-                        </button>
-                      )}
-                      {p.status !== "rejected" && (
-                        <button
-                          onClick={() => rejectPrijava(p.id)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-semibold transition-colors"
-                          style={{ background: "rgba(239,68,68,0.12)", color: "#ef4444", fontFamily: "Inter, sans-serif" }}
-                        >
-                          <Ban size={13} /> Odbij
-                        </button>
-                      )}
-                      {p.status !== "pending" && (
-                        <button
-                          onClick={() => reopenPrijava(p.id)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-semibold text-white/50 hover:text-white transition-colors"
-                          style={{ background: "rgba(255,255,255,0.05)", fontFamily: "Inter, sans-serif" }}
-                        >
-                          <RotateCcw size={13} /> Vrati na čekanje
-                        </button>
-                      )}
-                      <button
-                        onClick={() => deletePrijava(p.id)}
-                        className="ml-auto p-1.5 rounded-sm text-white/40 hover:text-red-400 hover:bg-red-500/10 transition-colors"
-                        title="Obriši"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-4 mt-6">
+                <button
+                  onClick={() => setPage(p => Math.max(0, p - 1))}
+                  disabled={safePage === 0}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-sm text-xs font-semibold text-white/60 hover:text-white disabled:opacity-30 disabled:hover:text-white/60 transition-colors"
+                  style={{ background: "rgba(255,255,255,0.05)", fontFamily: "Inter, sans-serif" }}
+                >
+                  <ChevronLeft size={14} /> Prethodna
+                </button>
+                <span className="text-xs text-white/40 tabular-nums" style={{ fontFamily: "Inter, sans-serif" }}>
+                  Strana {safePage + 1} / {totalPages}
+                </span>
+                <button
+                  onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+                  disabled={safePage >= totalPages - 1}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-sm text-xs font-semibold text-white/60 hover:text-white disabled:opacity-30 disabled:hover:text-white/60 transition-colors"
+                  style={{ background: "rgba(255,255,255,0.05)", fontFamily: "Inter, sans-serif" }}
+                >
+                  Sledeća <ChevronRight size={14} />
+                </button>
+              </div>
+            )}
 
             {visiblePrijave.length === 0 && (
               <div className="flex flex-col items-center text-center py-16 text-white/30">
