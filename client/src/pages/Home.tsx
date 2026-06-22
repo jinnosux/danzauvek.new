@@ -482,7 +482,7 @@ function Lineup() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-5">
           {allActs.map((act, i) => (
             <div
               key={i}
@@ -501,6 +501,12 @@ function Lineup() {
                   decoding="async"
                   className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                 />
+                {/* Orange tint - subtle brand wash over every photo */}
+                <div className="absolute inset-0 pointer-events-none" style={{
+                  background: "oklch(0.72 0.18 55)",
+                  mixBlendMode: "soft-light",
+                  opacity: 0.5,
+                }} />
                 <div className="absolute inset-0" style={{
                   background: "linear-gradient(0deg, rgba(13,13,13,0.9) 0%, rgba(13,13,13,0.3) 50%, transparent 100%)"
                 }} />
