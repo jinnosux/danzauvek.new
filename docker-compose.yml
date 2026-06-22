@@ -1,0 +1,22 @@
+services:
+  danzauvek-site:
+    build: .
+    container_name: danzauvek-site
+    restart: unless-stopped
+    environment:
+      - ADMIN_USER=${ADMIN_USER}
+      - ADMIN_PASS=${ADMIN_PASS}
+      - SESSION_SECRET=${SESSION_SECRET}
+    volumes:
+      # Persist uploaded gallery photos across redeploys.
+      - danzauvek_uploads:/app/uploads
+    expose:
+      - "3000"
+
+volumes:
+  danzauvek_uploads:
+
+networks:
+  default:
+    name: proxy_net
+    external: true

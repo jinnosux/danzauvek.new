@@ -1,0 +1,96 @@
+{
+  "day1": [
+    {
+      "time": "20:00",
+      "name": "Treća Generacija",
+      "genre": "Pop Rock",
+      "city": "Novi Pazar",
+      "img": "/bands/treca_generacija.jpeg",
+      "bio": "Treća Generacija je mladi bend iz Novog Pazara koji otvara festival sa punim žarom. Njihov autentičan pop-rock zvuk i snažna scenska energija savršen su uvod u dve noći nezaboravne muzike.",
+      "extended": "Bend Treća Generacija nastao je krajem 2025. godine, a osnovali su ga učenici Gimnazije sa ciljem približavanja ex-YU muzike u školi i gradu.\n\nBend pretežno svira pop-rock, u repertoaru ima pesme ex-YU bendova i Zdravko Čolić, a čini ga šest članova."
+    },
+    {
+      "time": "20:40",
+      "name": "Hrabri i Nerealni",
+      "genre": "Alternative Rock",
+      "city": "Raška",
+      "img": "/bands/hrabri_nerealni.jpg",
+      "bio": "Hrabri i Nerealni su sastav iz Raške čija poetika i neobični aranžmani donose svežinu na scenu. Spajaju alternativni rock sa introspektivnim tekstovima koji ostavljaju trag.",
+      "extended": ""
+    },
+    {
+      "time": "21:20",
+      "name": "Basil",
+      "genre": "Fusion",
+      "city": "Region",
+      "img": "/bands/basil.png",
+      "bio": "Basil donosi energičan nastup koji spaja rock i pop u jedinstven zvuk. Bend poznat po živim nastupima koji uvek ostavljaju publiku bez daha.",
+      "extended": "'Basil' je trio kojeg čine gitarista/basista Amar Mulić, pianista Adem Mehmedović i vokal Mina Mehmedović. Izvode originalnu muziku članova benda, kao i akustične obrade pop i rock pesama kroz fuziju jazz, rock i tradicionalnih folk stilova izvođenja.\n\nNjihov zvuk definišu guste, virtuozne deonice izvedene na istrumentima uz vokalnu genijalnost Mine Mehmedović. Na festivalu Dan Zauvek 2026., publici se predstavljaju kroz premijerno izvođenje autorske prog-rock muzike sa predstojećeg solo albuma Nerine, Amara Mulića."
+    },
+    {
+      "time": "22:00",
+      "name": "Sigma & Friends",
+      "genre": "Rock",
+      "city": "Novi Pazar",
+      "img": "/bands/sigma.jpeg",
+      "bio": "Sigma & Friends donosi moćan rock zvuk uz posebne goste koji svaki nastup čine jedinstvenim. Jedna od najočekivanijih tačaka prvog dana festivala.",
+      "extended": ""
+    },
+    {
+      "time": "23:15",
+      "name": "DJ Enes Daca",
+      "genre": "DJ Set",
+      "city": "Novi Pazar",
+      "img": "/bands/dj_enes_daca.jpeg",
+      "bio": "DJ Enes Daca zatvara prvu večer setom koji spaja minimal estetiku i pažljivo građenu atmosferu. Savršen kraj za prvu noć festivala.",
+      "extended": "Vođen intuicijom i strašću prema underground zvuku, Enes oblikuje setove kroz slojevite ritmove, hipnotične sekvence i prirodan razvoj energije. Njegov pristup muzici zasniva se na dubini, kontinuitetu i pažljivo građenoj atmosferi koja povezuje zvuk i publiku.\n\nKroz spoj minimal estetike, suptilne energije i dugogodišnjeg istraživanja muzike, gradi atmosferu koja istovremeno pokreće telo i zaokuplja pažnju slušaoca. Njegov zvuk karakterišu duboki groove obrasci, nepredvidivi detalji i sposobnost da publiku vodi kroz atmosferu koja se razvija prirodno, bez žurbe i bez kompromisa."
+    }
+  ],
+  "day2": [
+    {
+      "time": "20:00",
+      "name": "AUT",
+      "genre": "Rock",
+      "city": "Novi Pazar",
+      "img": "/bands/aut.jpg",
+      "bio": "AUT je bend iz Novog Pazara koji donosi autentičan indie rock zvuk sa izražajnom muzičkom vizijom. Svježi i energičan nastup koji najavljuje novu generaciju regionalnih muzičara.",
+      "extended": "AUT je rok bend nastao 2025. godine, sastavljen od četvorke koja kombinuje snažnu energiju i emotivne izvedbe: Hamza na gitari, Edin na basu, Amina kao glavni vokal i Mehmed za bubnjevima.\n\nKrenuli kao cover bend, AUT na scenu donosi nove interpretacije omiljenih rok hitova, uz jasnu ambiciju da uskoro predstave i sopstvene autorske pesme. Njihovi nastupi obećavaju glasnu, iskrenu i žestoku svirku koja publiku ne ostavlja ravnodušnom."
+    },
+    {
+      "time": "20:40",
+      "name": "Jazzwa",
+      "genre": "Funk Rock",
+      "city": "Raška",
+      "img": "/bands/jazzwa.jpg",
+      "bio": "Jazzwa je bend poznat po živim svirkama koje spajaju funk, rock i elektroniku u čistu emociju. Svaki njihov nastup je jedinstven i nepredvidiv doživljaj.",
+      "extended": ""
+    },
+    {
+      "time": "21:20",
+      "name": "Gospođo, Bate!",
+      "genre": "Funk Rock",
+      "city": "Novi Pazar",
+      "img": "/bands/gospodjo_bate.jpeg",
+      "bio": "Gospođo, Bate! je najaktuelniji lokalni bend oštrog i urbanog izraza. Sa nastupima na EXIT i Mikser festivalima iza sebe, dolaze kao pravi favoriti publike.",
+      "extended": ""
+    },
+    {
+      "time": "22:20",
+      "name": "Radnici od Kuće",
+      "genre": "Rock",
+      "city": "Novi Pazar",
+      "img": "/bands/radnici_od_kuce.png",
+      "bio": "Radnici od Kuće su cover bend kreativaca koji danju kodiraju, crtaju ili predaju, a uveče sviraju iz duše. Energičan nastup koji uvek iznenadi i oduševljava.",
+      "extended": ""
+    },
+    {
+      "time": "23:20",
+      "name": "DJ Irhad",
+      "genre": "DJ Set",
+      "city": "Novi Pazar",
+      "img": "/bands/dj_irhad.jpeg",
+      "bio": "DJ Irhad zatvara festival sa setom koji je pravi spektakl. Poznat po energičnim nastupima koji traju do zore, garantuje da festival završi na najvišem nivou.",
+      "extended": "DJ Irhad je dugogodišnji DJ iz Novog Pazara sa 30 godina iskustva iza pulta. Prepoznatljiv po pažljivo građenim setovima i atmosferi, kroz svoj zvuk spaja progressive, deep i melodic house pravce sa modernim elektronskim ritmom.\n\nNjegovi nastupi donose energično, ali istovremeno suptilno muzičko putovanje, uz odličan osećaj za publiku, dinamiku večeri i emotivan flow od početka do kraja seta. Tokom dugogodišnje karijere nastupao je na brojnim klubskim i festivalskim događajima, gradeći prepoznatljiv stil koji publika lako pamti.\n\nKroz spoj iskustva, moderne selekcije i pažljivo vođene energije, DJ Irhad na svakom nastupu stvara atmosferu koja publiku vodi kroz jedinstveno muzičko iskustvo. Deo je legendarnog dvojca Hippe Schizik."
+    }
+  ]
+}
