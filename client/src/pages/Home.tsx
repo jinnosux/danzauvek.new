@@ -663,12 +663,18 @@ function AboutFestival() {
             </div>
 
             {/* Venue photo — desktop only */}
-            <div className="hidden md:block rounded-sm overflow-hidden aspect-video">
+            <div className="hidden md:block relative rounded-sm overflow-hidden aspect-video">
               <img
                 src="/brand/venue.jpg"
                 alt="Bašta Troja - Dan Zauvek"
                 className="w-full h-full object-cover"
               />
+              {/* Orange tint - same brand wash as the Izvođači photos */}
+              <div className="absolute inset-0 pointer-events-none" style={{
+                background: "oklch(0.72 0.18 55)",
+                mixBlendMode: "soft-light",
+                opacity: 0.5,
+              }} />
             </div>
           </div>
         </div>
@@ -1225,10 +1231,20 @@ function Footer() {
                   {name}
                 </span>
               ))}
+              <a href="https://garage.radio" target="_blank" rel="noopener noreferrer" className="text-xs text-white/35" style={{ fontFamily: "Inter, sans-serif" }}>
+                Garage Radio
+              </a>
+              <span className="text-xs text-white/35" style={{ fontFamily: "Inter, sans-serif" }}>
+                Adar Media
+              </span>
             </div>
             {/* Mobile: one line, dot-separated */}
             <p className="block md:hidden text-xs text-white/35" style={{ fontFamily: "Inter, sans-serif" }}>
-              Udruženje Dan Zauvek &nbsp;·&nbsp; Grad Novi Pazar &nbsp;·&nbsp; Kulturni Centar Novi Pazar
+              Udruženje Dan Zauvek &nbsp;·&nbsp; Grad Novi Pazar &nbsp;·&nbsp; Kulturni Centar Novi Pazar &nbsp;·&nbsp;{" "}
+              <a href="https://garage.radio" target="_blank" rel="noopener noreferrer" className="text-white/35" style={{ fontFamily: "Inter, sans-serif" }}>
+                Garage Radio
+              </a>
+              &nbsp;·&nbsp; Adar Media
             </p>
           </div>
         </div>
