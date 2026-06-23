@@ -1234,9 +1234,6 @@ function Footer() {
               <a href="https://garage.radio" target="_blank" rel="noopener noreferrer" className="text-xs text-white/35" style={{ fontFamily: "Inter, sans-serif" }}>
                 Garage Radio
               </a>
-              <span className="text-xs text-white/35" style={{ fontFamily: "Inter, sans-serif" }}>
-                Adar Media
-              </span>
             </div>
             {/* Mobile: one line, dot-separated */}
             <p className="block md:hidden text-xs text-white/35" style={{ fontFamily: "Inter, sans-serif" }}>
