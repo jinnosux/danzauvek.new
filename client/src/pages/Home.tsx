@@ -1243,6 +1243,12 @@ function Footer() {
               </a>
               &nbsp;·&nbsp; Adar Media
             </p>
+
+            {/* Media coverage */}
+            <div className="section-label mb-4 mt-8">Medijska podrška</div>
+            <a href="https://taktinfo.rs" target="_blank" rel="noopener noreferrer" className="text-xs text-white/35" style={{ fontFamily: "Inter, sans-serif" }}>
+              TAKT
+            </a>
           </div>
         </div>
 
